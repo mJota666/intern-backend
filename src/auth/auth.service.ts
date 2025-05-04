@@ -53,7 +53,7 @@ export class AuthService {
       email: dto.email,
       name: dto.name,
       passwordHash: dto.password,  
-      role: 'client',
+      role: dto.role
     });
   }
 

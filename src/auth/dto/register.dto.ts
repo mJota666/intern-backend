@@ -1,4 +1,4 @@
-import { IsEmail, IsString } from 'class-validator';
+import { IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
 
 export class RegisterDto {
   @IsEmail()
@@ -9,4 +9,8 @@ export class RegisterDto {
 
   @IsString()
   password: string;
+  
+  @IsOptional()
+  @IsEnum(['admin', 'editor', 'client'] as const)
+  role?: 'admin' | 'editor' | 'client';
 }

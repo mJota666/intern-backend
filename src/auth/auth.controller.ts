@@ -38,6 +38,8 @@ export class AuthController {
   async register(@Body() dto: RegisterDto) {
     try {
       const user = await this.authService.register(dto);
+      console.log("user ne:")
+      console.log(user)
       return { id: user._id, email: user.email, name: user.name };
     } catch (e: any) {
       throw new BadRequestException(e.message);

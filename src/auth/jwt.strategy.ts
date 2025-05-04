@@ -18,13 +18,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(req: Request, payload: any) {
     const token = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
-
     const key = `session:${payload.sub}:${token}`;
     const exists = await this.redisClient.exists(key);
     if (!exists) {
       throw new UnauthorizedException();
     }
-
     return { userId: payload.sub, role: payload.role };
   }
 }

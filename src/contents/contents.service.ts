@@ -1,37 +1,63 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel }                   from '@nestjs/mongoose';
-import { Model }                         from 'mongoose';
-
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
+import { InjectModel }           from '@nestjs/mongoose';
+import { Model }                 from 'mongoose';
 import { Content, ContentDocument } from './schema/content.schema';
+import { CreateContentDto }      from './dto/create-content.dto';
+import { UpdateContentDto }      from './dto/update-content.dto';
 
 @Injectable()
 export class ContentsService {
-  constructor(@InjectModel(Content.name) private contentModel: Model<ContentDocument>) {}
+  constructor(
+    @InjectModel(Content.name)
+    private readonly contentModel: Model<ContentDocument>,
+  ) {}
 
-  findAll() {
+  async findAll(): Promise<ContentDocument[]> {
     return this.contentModel.find().exec();
   }
 
-  findOne(id: string) {
-    return this.contentModel.findById(id).exec();
+  async findOne(id: string): Promise<ContentDocument> {
+    const doc = await this.contentModel.findById(id).exec();
+    if (!doc) {
+      throw new NotFoundException(`Content ${id} not found`);
+    }
+    return doc;
   }
 
-  create(data: Partial<Content>) {
-    return this.contentModel.create(data);
+  async create(dto: CreateContentDto): Promise<ContentDocument> {
+    const created = new this.contentModel(dto);
+    return created.save();
   }
 
-  update(id: string, data: Partial<Content>) {
-    return this.contentModel.findByIdAndUpdate(id, data, { new: true }).exec();
+  async update(
+    id: string,
+    dto: UpdateContentDto,
+  ): Promise<ContentDocument> {
+    const doc = await this.contentModel.findById(id).exec();
+    if (!doc) {
+      throw new NotFoundException(`Content ${id} not found`);
+    }
+    Object.assign(doc, dto);
+    return doc.save();
   }
 
-  remove(id: string) {
-    return this.contentModel.findByIdAndDelete(id).exec();
+  async remove(id: string): Promise<void> {
+    const res = await this.contentModel.findByIdAndDelete(id).exec();
+    if (!res) {
+      throw new NotFoundException(`Content ${id} not found`);
+    }
   }
 
-  async submit(id: string) {
-    const content = await this.contentModel.findById(id);
-    if (!content) throw new NotFoundException();
-    content.published = true;
-    return content.save();
+  async submit(id: string): Promise<ContentDocument> {
+    const doc = await this.findOne(id);
+    if (doc.status !== 'draft') {
+      throw new ForbiddenException('Only drafts can be submitted');
+    }
+    doc.status = 'submitted';
+    return doc.save();
   }
 }

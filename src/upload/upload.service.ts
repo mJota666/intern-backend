@@ -32,7 +32,6 @@ export class UploadService {
       Body:        file.buffer,
       ContentType: file.mimetype,
     }));
-    // console.log(this.s3.re)
     return `https://${this.bucket}.s3.${this.region}.amazonaws.com/${key}`;
   }
 }

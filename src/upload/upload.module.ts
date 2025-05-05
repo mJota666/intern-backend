@@ -8,7 +8,7 @@ import { UploadController }  from './upload.controller';
   imports: [
     MulterModule.register({
       storage: require('multer').memoryStorage(),
-      limits: { fileSize: 10 * 1024 * 1024 }, // optional: max 10MB
+      limits: { fileSize: 10 * 1024 * 1024 },
     }),
   ],  providers: [UploadService],
   controllers: [UploadController],

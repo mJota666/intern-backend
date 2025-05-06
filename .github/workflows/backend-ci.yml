@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,8 +18,19 @@ jobs:
         with:
           node-version: '14'
 
+      - name: Verify Node.js version
+        run: node -v  # Ensure it's Node 14 or higher
+
+      - name: Clear npm cache
+        run: npm cache clean --force
+
+      - name: Delete node_modules and package-lock.json
+        run: |
+          rm -rf node_modules
+          rm -f package-lock.json
+
       - name: Install dependencies
-        run: npm install
+        run: npm ci  # or npm install
 
       - name: Build the project
         run: npm run build

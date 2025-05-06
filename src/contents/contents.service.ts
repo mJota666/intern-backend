@@ -54,10 +54,10 @@ export class ContentsService {
 
   async submit(id: string): Promise<ContentDocument> {
     const doc = await this.findOne(id);
-    if (doc.status !== 'draft') {
-      throw new ForbiddenException('Only drafts can be submitted');
-    }
-    doc.status = 'submitted';
+    // if (doc.status !== 'draft') {
+    //   throw new ForbiddenException('Only drafts can be submitted');
+    // }
+    doc.status = 'published';
     return doc.save();
   }
 }

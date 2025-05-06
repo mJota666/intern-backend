@@ -1,24 +1,23 @@
-FROM node:18-alpine
+# Use the official Node.js image as a base
+FROM node:16
 
-# install build deps for bcrypt
-RUN apk add --no-cache make g++ python3
-
+# Set the working directory inside the container
 WORKDIR /app
 
-# copy only package files first (for caching)
+# Install build dependencies for bcrypt
+RUN apt-get update && apt-get install -y build-essential python3
+
+# Copy package.json and package-lock.json to install dependencies
 COPY package*.json ./
 
-# install production deps
-RUN npm ci
+# Install the dependencies
+RUN npm install
 
-# rebuild bcrypt so it’s correct for this container’s Linux environment
-RUN npm rebuild bcrypt --build-from-source
-
-# now copy the rest of your code
+# Copy the rest of the application code
 COPY . .
 
-# build TypeScript
-RUN npm run build
-
+# Expose the application port
 EXPOSE 3000
-CMD ["node", "dist/main.js"]
+
+# Start the application
+CMD ["npm", "run", "start:dev"]

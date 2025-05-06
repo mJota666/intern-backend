@@ -14,6 +14,7 @@ import { GatewayModule }      from './gateway/content.gateway';
 import { AppController }      from './app.controller';
 import { AppService }         from './app.service';
 
+import { SeedModule } from 'seed/seed.module';
 import 'dotenv/config'
 
 @Module({
@@ -26,6 +27,7 @@ import 'dotenv/config'
     ContentsModule,
     UploadModule,
     GatewayModule,
+    SeedModule,
   ],
   controllers: [AppController],    
   providers: [AppService],         

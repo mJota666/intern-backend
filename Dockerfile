@@ -23,7 +23,7 @@
 # CMD ["npm", "run", "start:dev"]
 
 # Use an official Node.js image
-FROM node:16
+FROM node:20
 
 # Set the working directory inside the container
 WORKDIR /app

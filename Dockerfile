@@ -22,20 +22,23 @@
 # # Start the application
 # CMD ["npm", "run", "start:dev"]
 
-# Use an official Node.js runtime as a parent image
-FROM node:14
+# Use an official Node.js image
+FROM node:16
 
-# Set the working directory
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the current directory contents into the container
-COPY . .
+# Copy package.json and package-lock.json for npm install
+COPY package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Expose the backend port
+# Copy the rest of the application code
+COPY . .
+
+# Expose backend port
 EXPOSE 8080
 
-# Command to run the app
+# Command to run the backend app
 CMD ["npm", "run", "start"]

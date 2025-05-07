@@ -3,14 +3,10 @@ services:
   mongo:
     image: mongo:6
     restart: always
-    ports:
-      - "27017:27017"
 
   redis:
     image: redis:7-alpine
     restart: always
-    ports:
-      - "6379:6379"
 
   backend:
     build: .
@@ -19,6 +15,7 @@ services:
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - MONGO_URI=mongodb://mongo:27017/yourdb
     depends_on:
       - mongo
       - redis

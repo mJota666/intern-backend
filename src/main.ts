@@ -11,13 +11,11 @@ async function bootstrap() {
     console.log('Database seeded!');
   }
   app.enableCors({
-    
     origin: ['http://localhost:5173','http://localhost:5174', 'http://minhnguyen28.workspace.opstech.org:8081', "http://minhnguyen28.workspace.opstech.org:8082"],
     credentials: false,              
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   });
   await app.listen(process.env.PORT ?? 3000);
   console.log(`🚀 Backend listening on port ${process.env.PORT}`);
-
 }
 bootstrap();

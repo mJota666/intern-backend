@@ -11,7 +11,7 @@ async function bootstrap() {
     console.log('Database seeded!');
   }
   app.enableCors({
-    origin: ['http://localhost:5173','http://localhost:5174'],
+    origin: ['http://localhost:5173','http://localhost:5174', 'http://minhnguyen28.workspace.opstech.org:8081', "http://minhnguyen28.workspace.opstech.org:8082"],
     credentials: false,              
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   });

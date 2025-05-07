@@ -1,0 +1,59 @@
+name: Backend CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build the project
+        run: npm run build
+
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Install Docker and Fix Dependencies
+        run: |
+          # Remove existing containerd if there's a conflict
+          sudo apt-get remove --purge -y containerd
+          # Update package lists
+          sudo apt-get update --fix-missing
+          # Install containerd.io without conflicts
+          sudo apt-get install -y containerd.io
+          # Install Docker using the official script (this will install both Docker and dependencies)
+          curl -fsSL https://get.docker.com -o get-docker.sh
+          sudo sh get-docker.sh
+          # Enable and start Docker service
+          sudo systemctl enable docker
+          sudo systemctl start docker
+
+      - name: Deploy to Droplet
+        run: |
+          ssh -o StrictHostKeyChecking=no alsp@minhnguyen28.workspace.opstech.org << 'EOF'
+            cd /home/alsp/intern-backend
+            git pull origin main  # Pull the latest changes
+            git log -1  # Show the latest commit
+            sudo docker-compose down -v  # Stop containers and remove volumes
+            sudo docker-compose build --no-cache  # Force rebuild without cache
+            sudo docker-compose up -d  # Start containers with the updated build
+          EOF

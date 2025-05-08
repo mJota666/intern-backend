@@ -1,23 +1,29 @@
-# Use an official Node.js image
-FROM node:20
-
-# Set the working directory inside the container
+# ─── Stage 1: Builder ────────────────────────────────────────────────────────────
+FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Install build dependencies for bcrypt
-RUN apt-get update && apt-get install -y build-essential python3
-
-# Copy package.json and package-lock.json for npm install
-COPY package*.json ./
+# Install native build tools for bcrypt, etc.
+RUN apk add --no-cache build-base python3
 
 # Install dependencies
-RUN npm install
+COPY package*.json ./
+RUN npm ci
 
-# Copy the rest of the application code
+# Copy source
 COPY . .
 
-# Expose backend port
+# RUN npm run build
+
+# ─── Stage 2: Runtime ────────────────────────────────────────────────────────────
+FROM node:20-alpine AS runtime
+WORKDIR /app
+
+# Copy over just the production-ready files and modules
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app ./
+
+# Expose your API port
 EXPOSE 8080
 
-# Command to run the backend app
+# Launch your backend
 CMD ["npm", "run", "start"]

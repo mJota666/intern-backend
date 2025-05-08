@@ -24,7 +24,6 @@ jobs:
 
       - name: Install & test
         run: |
-          cd intern-backend
           npm ci
           npm test
 

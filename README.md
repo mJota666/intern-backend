@@ -1,5 +1,7 @@
 # Backend Service README
 
+**Demo URL**: [http://minhnguyen28.workspace.opstech.org:8082](http://minhnguyen28.workspace.opstech.org:8080)
+
 ## Giới thiệu
 
 Đây là dịch vụ backend của dự án Intern. Nó cung cấp API cho frontend, kết nối tới MongoDB và Redis để lưu trữ và cache dữ liệu.

@@ -1,29 +1,27 @@
-# ─── Stage 1: Builder ────────────────────────────────────────────────────────────
+# ─── Stage 1: Build ───────────────────────────────────────────────────────────
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Install native build tools for bcrypt, etc.
+# Install native build tools (for bcrypt, etc.)
 RUN apk add --no-cache build-base python3
 
-# Install dependencies
+# Copy deps and install
 COPY package*.json ./
 RUN npm ci
 
-# Copy source
+# Copy source & (optional) compile TS
 COPY . .
 
-# RUN npm run build
-
-# ─── Stage 2: Runtime ────────────────────────────────────────────────────────────
+# ─── Stage 2: Runtime ─────────────────────────────────────────────────────────
 FROM node:20-alpine AS runtime
 WORKDIR /app
 
-# Copy over just the production-ready files and modules
+# Copy production dependencies and source
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app ./
 
 # Expose your API port
 EXPOSE 8080
 
-# Launch your backend
+# Start your backend
 CMD ["npm", "run", "start"]

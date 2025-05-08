@@ -4,12 +4,16 @@ on:
   push:
     branches: [main]
     paths:
-      - 'intern-backend/**'
+      - '**/*.js'
+      - '**/*.ts'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'Dockerfile'
       - '.github/workflows/backend-ci.yml'
 
 jobs:
   build-and-push:
-    name: Build & Push Backend Image
+    name: Build & Push Image
     runs-on: ubuntu-latest
 
     steps:
@@ -38,10 +42,7 @@ jobs:
         run: |
           IMAGE=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/backend
           TAG=latest
-          docker build \
-            --file intern-backend/Dockerfile \
-            --tag $IMAGE:$TAG \
-            intern-backend
+          docker build -t $IMAGE:$TAG .
 
       - name: Push Docker image
         run: |
@@ -50,7 +51,7 @@ jobs:
           docker push $IMAGE:$TAG
 
   deploy:
-    name: Deploy Backend to Droplet
+    name: Deploy to Droplet
     needs: build-and-push
     runs-on: ubuntu-latest
 
@@ -73,7 +74,7 @@ jobs:
           IMAGE: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/backend
         run: |
           ssh -o ServerAliveInterval=60 $DEPLOY_USER@$DEPLOY_HOST << EOF
-            cd \$BACKEND_PATH
+            cd $BACKEND_PATH
             git pull origin main
             # Pull the latest image
             sudo docker pull ${IMAGE}:latest

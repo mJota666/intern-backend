@@ -19,4 +19,9 @@ describe('AppController', () => {
   //     expect(appController.getHello()).toBe('Hello World!');
   //   });
   // });
+  describe('Basic Jest test', () => {
+    it('should add two numbers correctly', () => {
+      expect(1 + 1).toBe(2)
+    })
+  })
 });

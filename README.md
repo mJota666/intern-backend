@@ -1,41 +1,130 @@
-# Hướng Dẫn Chạy Backend
+# Backend Service README
 
-Chào mừng bạn đến với dự án! Dưới đây là các bước để thiết lập và chạy backend.
+## Giới thiệu
 
-## Bước 1: Thêm file `.env`
+Đây là dịch vụ backend của dự án Intern. Nó cung cấp API cho frontend, kết nối tới MongoDB và Redis để lưu trữ và cache dữ liệu.
 
-Trước tiên, hãy tạo một file `.env` trong thư mục gốc của dự án với nội dung được gửi kèm qua gmail:
+## Mục lục
 
-## Bước 2: Cài đặt các gói cần thiết
+- [Yêu cầu](#yêu-cầu)
+- [Các biến môi trường](#các-biến-môi-trường)
+- [Cài đặt và chạy trên máy local](#cài-đặt-và-chạy-trên-máy-local)
 
-Mở terminal và chạy lệnh:
+  - [1. Clone repository](#1-clone-repository)
+  - [2. Tạo file `.env`](#2-tạo-file-env)
+  - [3. Khởi động MongoDB và Redis](#3-khởi-động-mongodb-và-redis)
+  - [4. Cài đặt dependencies và seed dữ liệu](#4-cài-đặt-dependencies-và-seed-dữ-liệu)
+  - [5. Chạy ứng dụng](#5-chạy-ứng-dụng)
 
-```bash
-npm install
+- [Chạy bằng Docker Compose](#chạy-bằng-docker-compose)
+- [Các lệnh thường dùng](#các-lệnh-thường-dùng)
+- [Tài khoản mặc định](#tài-khoản-mặc-định)
+- [License](#license)
+
+## Yêu cầu
+
+- Node.js v20+
+- npm
+- Docker (nếu sử dụng Docker Compose)
+
+## Các biến môi trường
+
+Tất cả các biến môi trường nằm trong file `.env` ở thư mục gốc. Ví dụ:
+
+```dotenv
+# Database
+MONGODB_URI=mongodb://localhost:27017/intern-db
+SEED=true
+
+# Redis
+REDIS_HOST=localhost
+REDIS_PORT=6379
+
+# JWT
+JWT_SECRET=superSecretKey
+JWT_EXPIRES_IN=3600s
+
+# AWS S3 (nếu cần)
+AWS_REGION=us-east-1
+AWS_S3_BUCKET=intern-app-media-storage
+AWS_ACCESS_KEY_ID=AKIA...
+AWS_SECRET_ACCESS_KEY=...
+
+# App
+PORT=8080
 ```
 
-## Bước 3: Chạy Docker
+## Chạy ứng dụng bằng Docker Compose
 
-Sau khi cài đặt xong, bạn có thể khởi động các dịch vụ Docker bằng lệnh sau:
+Chỉ với Docker Compose, bạn có thể khởi động toàn bộ stack (backend, MongoDB, Redis) bằng các bước sau:
 
-```bash
-docker-compose up --build -d
-```
+1. Đảm bảo có file `.env` trong thư mục gốc chứa các biến môi trường.
+2. Tạo file `docker-compose.yml` với nội dung:
 
-## Tài Khoản Mặc Định
+   ```yaml
+   version: '3.8'
 
-Sau khi khởi động thành công, ta khởi chạy các project admin-frontend và client-frontend với các tài khoản sau:
+   services:
+     backend:
+       build:
+         context: .
+         dockerfile: Dockerfile
+       ports:
+         - '8080:8080'
+       env_file:
+         - ./.env
+       depends_on:
+         - mongo
+         - redis
 
-- **Tài khoản Admin**:
+     mongo:
+       image: mongo:6
+       restart: always
+       ports:
+         - '27017:27017'
+       volumes:
+         - mongo-data:/data/db
+
+     redis:
+       image: redis:7-alpine
+       restart: always
+       ports:
+         - '6379:6379'
+
+   volumes:
+     mongo-data:
+   ```
+
+3. Chạy lệnh:
+
+   ```bash
+   docker-compose up --build -d
+   ```
+
+Backend sẽ tự động tải biến môi trường và khởi động dịch vụ.
+
+## Các lệnh thường dùng
+
+- `npm run start` - Chạy server
+- `npm run start:dev` - Chạy server trong chế độ phát triển với Nest CLI
+- `npm run test` - Chạy test
+- `npm run seed` - Seed dữ liệu mẫu
+- `docker-compose up -d` - Khởi động các container trong nền
+- `docker-compose down` - Dừng và xóa các container
+
+## Tài khoản mặc định
+
+- **Admin**
 
   - Email: `admin@example.com`
   - Mật khẩu: `admin`
 
-- **Tài khoản Editor**:
+- **Editor**
 
   - Email: `editor@example.com`
   - Mật khẩu: `editor`
 
-- **Tài khoản Client**:
+- **Client**
+
   - Email: `client@example.com`
   - Mật khẩu: `client`
